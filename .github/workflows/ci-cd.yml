@@ -1,0 +1,93 @@
+name: Helpmefy CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  # Linter and Code Quality check
+  lint-and-validate:
+    name: Code Quality Lints & Validations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Linting Packages
+        run: |
+          npm install -g htmlhint csslint
+
+      - name: Run HTML Structure Validation
+        run: |
+          htmlhint index.html --rules "tagname-lowercase=true,attr-lowercase=true,attr-value-double-quotes=true,doctype-first=true,tag-pair=true,spec-char-escape=true,id-unique=true"
+
+      - name: Run CSS Rules Validation
+        run: |
+          csslint --ignore=adjoining-classes,box-sizing,box-model styles.css
+
+      - name: Perform Syntactic Integrity Check
+        run: |
+          node -c app.js
+
+  # Docker Container Build Validation
+  build-docker-image:
+    name: Compile & Build Docker Image
+    needs: lint-and-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU for multi-platform
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Container (No Push)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: rishi403/helpmefy-app:latest,rishi403/helpmefy-app:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Simulated Cloud Deployment
+  deploy-to-production:
+    name: Continuous Automated Deployment
+    needs: build-docker-image
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Simulate Production Registry Push
+        run: |
+          echo "Connecting to GitHub Container Registry (GHCR)..."
+          echo "Simulating authentication with Secrets.DOCKER_HUB_ACCESS_TOKEN..."
+          echo "Pushing image: rishi403/helpmefy-app:latest"
+          echo "Successfully pushed build image matching SHA: ${{ github.sha }} to repository registry."
+
+      - name: Simulate SSH Production Server Deploy
+        run: |
+          echo "Opening secure socket tunnel with server ssh: devops.helpmefy.org..."
+          echo "Pulling latest docker container: rishi403/helpmefy-app:latest..."
+          echo "Stopping previous container helpmefy_web_container..."
+          echo "Running new container orchestrator binding host port 8080 to container port 80..."
+          echo "Executing local health-check curl probe..."
+          echo "Server health-check: SUCCESS! Response status code 200 OK."
+          echo "Pipeline run completed successfully. Deploy finished!"
