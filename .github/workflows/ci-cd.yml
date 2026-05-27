@@ -11,7 +11,7 @@ on:
       - master
 
 jobs:
-  # Linter and Code Quality check
+
   lint-and-validate:
     name: Code Quality Lints & Validations
     runs-on: ubuntu-latest
@@ -40,7 +40,6 @@ jobs:
         run: |
           node -c app.js
 
-  # Docker Container Build Validation
   build-docker-image:
     name: Compile & Build Docker Image
     needs: lint-and-validate
@@ -65,7 +64,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Simulated Cloud Deployment
   deploy-to-production:
     name: Continuous Automated Deployment
     needs: build-docker-image

@@ -1,15 +1,4 @@
-/* ==========================================================================
-   Helpmefy Application Engine
-   Features:
-   - State-driven single page application flow
-   - Standard Web Audio procedural synth effects
-   - Geolocation coordinates retriever with elegant fallback
-   - CSS & HTML5 Canvas Tactical Grid map simulation
-   - Multi-speed Countdown Timer (1x, 10x, 50x, 200x speed)
-   - Volunteer simulated dispatch control center
-   ========================================================================== */
 
-// --- Global App State Constants ---
 const APP_STATES = {
   IDLE: 'IDLE',
   FORM: 'FORM',
@@ -32,46 +21,40 @@ const VOLUNTEERS_POOL = [
   { name: 'Ananya Roy', id: '#8890', phone: '+91 91023 55678' }
 ];
 
-// --- Core Variables ---
 let currentState = APP_STATES.IDLE;
-let userCoords = { lat: 28.6139, lon: 77.2090 }; // Default simulated Delhi
+let userCoords = { lat: 28.6139, lon: 77.2090 }; 
 let isLocationMocked = true;
 let selectedService = 'Ambulance';
 let userPhoneNumber = '';
 let isOutsideCity = false;
 
-// Timer configurations
-let totalSeconds = 300; // 5 mins default
+let totalSeconds = 300; 
 let remainingSeconds = 300;
-let simSpeed = 1; // Simulation multiplier (1x, 10x, 50x, 200x)
+let simSpeed = 1; 
 let timerInterval = null;
 let activeVolunteer = null;
 
-// Map canvas variables
 let canvas = null;
 let ctx = null;
 let animationFrameId = null;
-let volunteerPos = { x: 50, y: 50 }; // Simulated starting location
-let targetPos = { x: 200, y: 200 }; // User location
-let secondaryVolunteers = []; // Background active units
+let volunteerPos = { x: 50, y: 50 }; 
+let targetPos = { x: 200, y: 200 }; 
+let secondaryVolunteers = []; 
 
-// Web Audio API Synthesizer Context
 let audioCtx = null;
 
-// --- Initialize DOM Elements ---
 document.addEventListener('DOMContentLoaded', () => {
   initDOM();
   initMap();
   setupEventListeners();
   randomizeBackgroundVolunteers();
   
-  // Initialize lucide icons at load
+  
   if (window.lucide) {
     window.lucide.createIcons();
   }
 });
 
-// Cache DOM elements
 let views = {};
 let btnEmergency = null;
 let btnBackToIdle = null;
@@ -152,7 +135,6 @@ function initDOM() {
   btnSimForceArrive = document.getElementById('sim-force-arrive');
 }
 
-// --- Synth Sound FX Generators (Web Audio API) ---
 function getAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -197,7 +179,7 @@ function playSound(type) {
       osc.stop(now + 0.35);
     } 
     else if (type === 'dispatch') {
-      // Short radio click
+      
       const osc1 = ctx.createOscillator();
       const filter = ctx.createBiquadFilter();
       const gain = ctx.createGain();
@@ -222,10 +204,10 @@ function playSound(type) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.setValueAtTime(659.25, now + 0.12); // E5
-      osc.frequency.setValueAtTime(783.99, now + 0.24); // G5
-      osc.frequency.setValueAtTime(1046.50, now + 0.36); // C6
+      osc.frequency.setValueAtTime(523.25, now); 
+      osc.frequency.setValueAtTime(659.25, now + 0.12); 
+      osc.frequency.setValueAtTime(783.99, now + 0.24); 
+      osc.frequency.setValueAtTime(1046.50, now + 0.36); 
       gain.gain.setValueAtTime(0.2, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
       osc.connect(gain);
@@ -238,11 +220,10 @@ function playSound(type) {
   }
 }
 
-// --- Navigation / View Coordinator ---
 function switchState(newState) {
   currentState = newState;
   
-  // Update view classes for transition
+  
   Object.keys(views).forEach(state => {
     if (state === newState) {
       views[state].classList.add('active');
@@ -251,10 +232,10 @@ function switchState(newState) {
     }
   });
 
-  // Dynamic simulation button locking
+  
   updateSimulatorButtonLocking();
 
-  // Reset or run state specific scripts
+  
   if (newState === APP_STATES.IDLE) {
     stopActiveTimer();
     document.getElementById('map-gps-status').innerText = "Idle Grid";
@@ -274,7 +255,6 @@ function switchState(newState) {
   }
 }
 
-// --- Location coordinates locator ---
 function acquireUserLocation() {
   switchState(APP_STATES.FORM);
   playSound('click');
@@ -313,7 +293,7 @@ function acquireUserLocation() {
 }
 
 function generateFallbackMockCoordinates(container) {
-  // Generate random coords representing nearby cities (Delhi / Mumbai etc.)
+  
   const cities = [
     { name: "Delhi Suburbs", lat: 28.6139, lon: 77.2090 },
     { name: "Mumbai Hub", lat: 19.0760, lon: 72.8777 },
@@ -321,7 +301,7 @@ function generateFallbackMockCoordinates(container) {
   ];
   const city = cities[Math.floor(Math.random() * cities.length)];
   
-  // Add minor noise to make it dynamic
+  
   userCoords.lat = city.lat + (Math.random() - 0.5) * 0.05;
   userCoords.lon = city.lon + (Math.random() - 0.5) * 0.05;
   isLocationMocked = true;
@@ -334,25 +314,24 @@ function generateFallbackMockCoordinates(container) {
   }, 1000);
 }
 
-// --- Setup Event Listeners ---
 function setupEventListeners() {
-  // Front emergency click
+  
   btnEmergency.addEventListener('click', () => {
     acquireUserLocation();
   });
 
-  // Back to home
+  
   btnBackToIdle.addEventListener('click', () => {
     playSound('click');
     switchState(APP_STATES.IDLE);
   });
 
-  // Refresh Geolocation coords
+  
   btnReLocate.addEventListener('click', () => {
     acquireUserLocation();
   });
 
-  // Toggle checkbox updates the helper hint text
+  
   chkOutsideCity.addEventListener('change', () => {
     playSound('click');
     isOutsideCity = chkOutsideCity.checked;
@@ -365,13 +344,13 @@ function setupEventListeners() {
     }
   });
 
-  // Form Submit Dispatches SOS
+  
   emergencyForm.addEventListener('submit', (e) => {
     e.preventDefault();
     triggerSOSSubmission();
   });
 
-  // Active cancel
+  
   btnCancelActive.addEventListener('click', () => {
     playSound('click');
     if (confirm("Are you sure you want to cancel this emergency request?")) {
@@ -379,19 +358,19 @@ function setupEventListeners() {
     }
   });
 
-  // Success Reset Home
+  
   btnResetSuccess.addEventListener('click', () => {
     playSound('click');
     switchState(APP_STATES.IDLE);
   });
 
-  // Simulator Drawer Slider
+  
   drawerToggle.addEventListener('click', () => {
     simulatorDrawer.classList.toggle('open');
     playSound('click');
   });
 
-  // Simulator Speed Toggles
+  
   simSpeedBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       simSpeedBtns.forEach(b => b.classList.remove('active'));
@@ -401,21 +380,21 @@ function setupEventListeners() {
     });
   });
 
-  // Simulator Auto-Fill GPS Coords
+  
   btnSimLocation.addEventListener('click', () => {
     if (currentState === APP_STATES.FORM) {
       generateFallbackMockCoordinates(document.querySelector('.location-status-container'));
     }
   });
 
-  // Simulator Accept volunteer manually
+  
   btnSimAccept.addEventListener('click', () => {
     if (currentState === APP_STATES.ACTIVE && remainingSeconds > totalSeconds * 0.9) {
       triggerVolunteerMatched();
     }
   });
 
-  // Simulator Fast-Forward
+  
   btnSimFastForward.addEventListener('click', () => {
     if (currentState === APP_STATES.ACTIVE && remainingSeconds > 10) {
       remainingSeconds = 10;
@@ -423,7 +402,7 @@ function setupEventListeners() {
     }
   });
 
-  // Simulator Force Arrive
+  
   btnSimForceArrive.addEventListener('click', () => {
     if (currentState === APP_STATES.ACTIVE) {
       triggerArrivalSuccess();
@@ -431,66 +410,64 @@ function setupEventListeners() {
   });
 }
 
-// --- Submit SOS Request Flow ---
 function triggerSOSSubmission() {
   playSound('sos');
   
-  // Read service chosen
+  
   const selectedRadio = document.querySelector('input[name="service_type"]:checked');
   selectedService = selectedRadio ? selectedRadio.value : 'Ambulance';
   
-  // Read variables
+  
   userPhoneNumber = document.getElementById('phone-input').value;
   isOutsideCity = chkOutsideCity.checked;
 
-  // Set standard emergency timer values based on checkbox selection
-  totalSeconds = isOutsideCity ? 900 : 300; // 15 mins vs 5 mins
+  
+  totalSeconds = isOutsideCity ? 900 : 300; 
   remainingSeconds = totalSeconds;
   
-  // Pick random volunteer
+  
   activeVolunteer = VOLUNTEERS_POOL[Math.floor(Math.random() * VOLUNTEERS_POOL.length)];
   
-  // Change UI active color based on service chosen
+  
   setupActiveDashboardColor(selectedService);
 
-  // Switch view to Active screen
+  
   switchState(APP_STATES.ACTIVE);
   
-  // Start countdown & simulated milestones
+  
   startActiveCountdown();
 }
 
 function setupActiveDashboardColor(service) {
-  // Clear classes
+  
   timerBar.className = "timer-progress";
   
-  // Clear step-bullet classes
+  
   stepMatching.className = "pipeline-step active";
   stepEnroute.className = "pipeline-step";
   stepArrived.className = "pipeline-step";
   
   const servInfo = SERVICES[service];
   
-  // Add class color themes
+  
   timerBar.classList.add(`${servInfo.class}-timer`);
   stepMatching.classList.add(`active-${servInfo.class}`);
   stepEnroute.classList.add(`active-${servInfo.class}`);
   stepArrived.classList.add(`active-${servInfo.class}`);
   
-  // Update texts
+  
   lblTimerType.innerText = isOutsideCity ? "Outside City (15 Min Target)" : "Within City (5 Min Target)";
   trackingTitle.innerText = `Dispatching nearest ${servInfo.name}...`;
 }
 
-// --- Countdown Engine & Milestones ---
 function startActiveCountdown() {
   stopActiveTimer();
   
-  // Log request times
+  
   const d = new Date();
   lblRequestTime.innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   
-  // Set pipeline elements
+  
   stepRequested.className = "pipeline-step completed";
   stepMatching.className = "pipeline-step active";
   stepEnroute.className = "pipeline-step";
@@ -499,13 +476,13 @@ function startActiveCountdown() {
   lblMatchDesc.innerText = "Scanning volunteer grid array...";
   lblVolunteerDesc.innerText = "Awaiting coordinate confirmation...";
 
-  // Reset positions on map
+  
   resetMapPositions();
 
-  // Run countdown loop
+  
   timerInterval = setInterval(() => {
-    // Decrease based on speed multiplier
-    remainingSeconds -= 1 * (simSpeed / 10); // Div 10 because we run interval at 100ms for high resolution
+    
+    remainingSeconds -= 1 * (simSpeed / 10); 
     
     if (remainingSeconds <= 0) {
       remainingSeconds = 0;
@@ -513,7 +490,7 @@ function startActiveCountdown() {
     } else {
       updateActiveTimerUI();
     }
-  }, 100); // 100ms interval for extremely smooth high-speed ticking
+  }, 100); 
 }
 
 function stopActiveTimer() {
@@ -524,37 +501,37 @@ function stopActiveTimer() {
 }
 
 function updateActiveTimerUI() {
-  // Calc human readable digital output
+  
   const mins = Math.floor(remainingSeconds / 60);
   const secs = Math.floor(remainingSeconds % 60);
   lblTimer.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
-  // SVG Radial stroke offset calculation
+  
   const progressRatio = remainingSeconds / totalSeconds;
   const strokeOffset = 440 * (1 - progressRatio);
   timerBar.style.strokeDashoffset = strokeOffset;
 
-  // Process Pipeline Milestones based on percentages
+  
   const pct = (remainingSeconds / totalSeconds) * 100;
 
-  // Phase 1: Matching Volunteer (First 15% of total time or until forced)
+  
   if (pct > 85) {
     stepRequested.className = "pipeline-step completed";
     stepMatching.className = "pipeline-step active";
     stepEnroute.className = "pipeline-step";
     
-    // Play radar sonar procedural tick every 3 seconds equivalent
+    
     if (Math.floor(remainingSeconds) % 3 === 0 && remainingSeconds % 1 < 0.1) {
       playSound('sos');
     }
   } 
-  // Phase 2: Volunteer En Route
+  
   else if (pct <= 85 && pct > 0) {
     if (stepMatching.classList.contains('active')) {
       triggerVolunteerMatched();
     }
     
-    // As timer approaches zero, coordinate en-route update text
+    
     if (pct < 15) {
       lblVolunteerDesc.innerText = `${activeVolunteer.name} is arriving in seconds. Prepare to greet him!`;
     }
@@ -578,15 +555,15 @@ function triggerArrivalSuccess() {
   stopActiveTimer();
   playSound('alert');
 
-  // Fill in complete dashboard
+  
   stepRequested.className = "pipeline-step completed";
   stepMatching.className = "pipeline-step completed";
   stepEnroute.className = "pipeline-step completed";
   stepArrived.className = "pipeline-step active completed";
   
-  // Transition success panel
+  
   setTimeout(() => {
-    // Fill success summaries
+    
     sumService.innerText = selectedService;
     sumVolunteer.innerText = `${activeVolunteer.name} (Volunteer ${activeVolunteer.id})`;
     sumPhone.innerText = userPhoneNumber || '+91 98765 43210';
@@ -594,7 +571,7 @@ function triggerArrivalSuccess() {
     
     switchState(APP_STATES.SUCCESS);
 
-    // Canvas Confetti Celebration!
+    
     if (window.confetti) {
       window.confetti({
         particleCount: 150,
@@ -607,7 +584,7 @@ function triggerArrivalSuccess() {
 }
 
 function updateSimulatorButtonLocking() {
-  // Lock simulator actions depending on active flow
+  
   if (currentState === APP_STATES.FORM) {
     btnSimLocation.disabled = false;
     btnSimAccept.disabled = true;
@@ -628,16 +605,15 @@ function updateSimulatorButtonLocking() {
   }
 }
 
-// --- Tactical Canvas Map Engine ---
 function initMap() {
   canvas = document.getElementById('map-canvas');
   ctx = canvas.getContext('2d');
 
-  // Resize canvas handler
+  
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
-  // Run render loop
+  
   animateMap();
 }
 
@@ -652,13 +628,13 @@ function resizeCanvas() {
 function resetMapPositions() {
   if (!canvas) return;
   
-  // Set User coordinates (Target) at center of screen
+  
   targetPos = {
     x: canvas.width / 2,
     y: canvas.height / 2
   };
 
-  // Volunteer starts far off, somewhere on edge of map
+  
   const angle = Math.random() * Math.PI * 2;
   const distance = Math.max(canvas.width, canvas.height) * 0.4;
   
@@ -670,7 +646,7 @@ function resetMapPositions() {
 
 function randomizeBackgroundVolunteers() {
   secondaryVolunteers = [];
-  // Populate surrounding crew dots moving randomly on map
+  
   for (let i = 0; i < 15; i++) {
     secondaryVolunteers.push({
       x: Math.random() * 500,
@@ -686,10 +662,10 @@ function randomizeBackgroundVolunteers() {
 function animateMap() {
   if (!ctx || !canvas) return;
 
-  // Clear map screen
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // RENDER GRID CHANNELS
+  
   ctx.strokeStyle = 'rgba(99, 102, 241, 0.03)';
   ctx.lineWidth = 1;
   const gridSize = 40;
@@ -706,21 +682,21 @@ function animateMap() {
     ctx.stroke();
   }
 
-  // UPDATE & RENDER BACKGROUND PATROL VOLUNTEERS
+  
   secondaryVolunteers.forEach(v => {
-    // Keep within borders
+    
     v.x += v.vx;
     v.y += v.vy;
     if (v.x < 0 || v.x > canvas.width) v.vx *= -1;
     if (v.y < 0 || v.y > canvas.height) v.vy *= -1;
 
-    // Draw little on-patrol crosshair dots
+    
     ctx.beginPath();
     ctx.arc(v.x, v.y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = SERVICES[v.service].color + '66'; // semi-transparent
+    ctx.fillStyle = SERVICES[v.service].color + '66'; 
     ctx.fill();
 
-    // Minor status glow pulse ring
+    
     v.pulse += 0.01;
     if (v.pulse > 1) v.pulse = 0;
     
@@ -731,7 +707,7 @@ function animateMap() {
     ctx.stroke();
   });
 
-  // DRAW SOS RADAR SCAN SWEEPS (When requesting or active)
+  
   if (currentState === APP_STATES.FORM || currentState === APP_STATES.ACTIVE) {
     const time = Date.now() * 0.001;
     const scanRadius = (time % 4) * (canvas.width * 0.25);
@@ -742,28 +718,28 @@ function animateMap() {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Radial grid concentric circle
+    
     ctx.beginPath();
     ctx.arc(targetPos.x, targetPos.y, canvas.width * 0.15, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
     ctx.stroke();
   }
 
-  // RENDER DYNAMIC ACTIVE SOS ROUTE & GPS DISPATCH CAR
+  
   if (currentState === APP_STATES.ACTIVE || currentState === APP_STATES.SUCCESS) {
     const servColor = SERVICES[selectedService].color;
     
-    // 1. Draw route line connecting User to Volunteer
+    
     ctx.beginPath();
     ctx.moveTo(volunteerPos.x, volunteerPos.y);
     ctx.lineTo(targetPos.x, targetPos.y);
-    ctx.strokeStyle = servColor + '33'; // dotted base path line
+    ctx.strokeStyle = servColor + '33'; 
     ctx.lineWidth = 2;
     ctx.setLineDash([6, 6]);
     ctx.stroke();
-    ctx.setLineDash([]); // clear dash
+    ctx.setLineDash([]); 
 
-    // Solid progress path line representing en route
+    
     const pctElapsed = 1 - (remainingSeconds / totalSeconds);
     const currX = volunteerPos.x + (targetPos.x - volunteerPos.x) * pctElapsed;
     const currY = volunteerPos.y + (targetPos.y - volunteerPos.y) * pctElapsed;
@@ -776,9 +752,9 @@ function animateMap() {
     ctx.shadowBlur = 15;
     ctx.shadowColor = servColor;
     ctx.stroke();
-    ctx.shadowBlur = 0; // reset shadow
+    ctx.shadowBlur = 0; 
 
-    // 2. Draw Volunteer SOS Unit dot (moving vehicle representation)
+    
     ctx.beginPath();
     ctx.arc(currX, currY, 9, 0, Math.PI * 2);
     ctx.fillStyle = servColor;
@@ -787,7 +763,7 @@ function animateMap() {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Volunteer outer sonar pulses
+    
     const volPulse = (Date.now() % 1500) / 1500;
     ctx.beginPath();
     ctx.arc(currX, currY, 9 + volPulse * 15, 0, Math.PI * 2);
@@ -795,25 +771,25 @@ function animateMap() {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Label indicator tag on top of helper
+    
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 10px Plus Jakarta Sans';
     ctx.textAlign = 'center';
     ctx.fillText(activeVolunteer ? activeVolunteer.name.split(' ')[0] : 'Crew', currX, currY - 18);
   }
 
-  // ALWAYS RENDER USER CENTRAL GPS TARGET BLINKER
+  
   if (currentState === APP_STATES.FORM || currentState === APP_STATES.ACTIVE || currentState === APP_STATES.SUCCESS) {
     const userPulse = (Date.now() % 2000) / 2000;
     
-    // Outer pulse ring
+    
     ctx.beginPath();
     ctx.arc(targetPos.x, targetPos.y, 8 + userPulse * 22, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Inner glowing core dot
+    
     ctx.beginPath();
     ctx.arc(targetPos.x, targetPos.y, 7, 0, Math.PI * 2);
     ctx.fillStyle = '#6366f1';
@@ -822,13 +798,13 @@ function animateMap() {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Label tag
+    
     ctx.fillStyle = '#ffffff';
     ctx.font = '800 10px Outfit';
     ctx.textAlign = 'center';
     ctx.fillText('MY SOS LOCATION', targetPos.x, targetPos.y + 24);
   }
 
-  // Request next animation tick
+  
   animationFrameId = requestAnimationFrame(animateMap);
 }

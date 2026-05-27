@@ -5,25 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Helpmefy: Automated Community Emergency Rescue Platform. Instant volunteer dispatch for Medical, Roadside, Fuel, Food, and Emergency help.">
   <title>Helpmefy | Automated Community Help & CI/CD Demo</title>
-  <!-- Google Fonts -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Lucide Icons CDN -->
+  
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Canvas Confetti CDN for success state -->
+  
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Background Blur Elements for glassmorphic depth -->
+  
   <div class="glow-sphere sphere-1"></div>
   <div class="glow-sphere sphere-2"></div>
   <div class="glow-sphere sphere-3"></div>
 
   <div class="app-container">
-    <!-- Header -->
+    
     <header class="app-header">
       <div class="logo-area">
         <div class="logo-icon">
@@ -46,13 +46,13 @@
       </div>
     </header>
 
-    <!-- Main Content Grid -->
+    
     <main class="app-main">
       
-      <!-- Left Side: Interactive Map & Emergency Center -->
+      
       <section class="left-panel">
         
-        <!-- Emergency Activation Screen (Default View) -->
+        
         <div id="screen-idle" class="app-card main-emergency-card active">
           <div class="card-glow"></div>
           <div class="emergency-hero">
@@ -84,7 +84,7 @@
           </div>
         </div>
 
-        <!-- Request Details Form Modal/Card (Step 2) -->
+        
         <div id="screen-form" class="app-card form-card">
           <div class="card-header">
             <button id="btn-back-to-idle" class="btn-icon-back">
@@ -97,7 +97,7 @@
           </div>
 
           <form id="emergency-form" class="emergency-form" onsubmit="return false;">
-            <!-- Location status section -->
+            
             <div class="location-status-container success">
               <div class="loc-indicator">
                 <i data-lucide="map-pin" class="pin-bounce"></i>
@@ -111,7 +111,7 @@
               </button>
             </div>
 
-            <!-- Service Selection Cards -->
+            
             <div class="form-group">
               <label class="form-label">Select Emergency Service Needed</label>
               <div class="service-grid">
@@ -150,7 +150,7 @@
               </div>
             </div>
 
-            <!-- Phone Number Input -->
+            
             <div class="form-group">
               <label class="form-label" for="phone-input">Contact Phone Number</label>
               <div class="phone-input-wrapper">
@@ -160,7 +160,7 @@
               <small class="form-hint">Volunteers will call this number to coordinate arrival.</small>
             </div>
 
-            <!-- Location Type Switch -->
+            
             <div class="form-group toggle-group">
               <div class="toggle-text">
                 <span class="toggle-title">Outside the City Boundaries?</span>
@@ -172,7 +172,7 @@
               </label>
             </div>
 
-            <!-- Submit Button -->
+            
             <button type="submit" id="btn-submit-emergency" class="btn-primary-dispatch">
               <i data-lucide="navigation"></i>
               <span>Dispatch Emergency Helper Now</span>
@@ -180,7 +180,7 @@
           </form>
         </div>
 
-        <!-- Active Timer and Status Screen (Step 3) -->
+        
         <div id="screen-active" class="app-card active-tracking-card">
           <div class="card-header borderless">
             <span class="active-tag"><span class="pulse-dot"></span>SOS Emergency Dispatched</span>
@@ -188,7 +188,7 @@
           </div>
 
           <div class="tracking-display">
-            <!-- Digital & Radial Countdown Timer -->
+            
             <div class="timer-container">
               <svg class="timer-svg" viewBox="0 0 160 160">
                 <circle class="timer-bg" cx="80" cy="80" r="70"></circle>
@@ -200,7 +200,7 @@
               </div>
             </div>
 
-            <!-- Live Status Pipeline -->
+            
             <div class="status-pipeline">
               <div class="pipeline-step completed" id="step-requested">
                 <div class="step-bullet"><i data-lucide="check"></i></div>
@@ -233,7 +233,7 @@
             </div>
           </div>
 
-          <!-- Dynamic Cancel Emergency Trigger -->
+          
           <div class="active-actions">
             <button id="btn-cancel-active" class="btn-secondary-cancel">
               <i data-lucide="x-circle"></i> Cancel SOS Request
@@ -241,7 +241,7 @@
           </div>
         </div>
 
-        <!-- Success Completed State -->
+        
         <div id="screen-success" class="app-card success-card">
           <div class="success-header">
             <div class="success-icon-badge">
@@ -277,7 +277,7 @@
 
       </section>
 
-      <!-- Right Side: Beautiful Interactive Vector Map -->
+      
       <section class="right-panel">
         <div class="app-card map-card">
           <div class="map-overlay-header">
@@ -288,13 +288,13 @@
             <span class="map-subtitle">Live Simulated Coverage Grid</span>
           </div>
 
-          <!-- CSS & JS Animated Map Area -->
+          
           <div class="map-viewport">
             <div class="grid-overlay"></div>
-            <!-- Canvas for route rendering and volunteer movement -->
+            
             <canvas id="map-canvas"></canvas>
             
-            <!-- Beautiful Floating Map Widgets -->
+            
             <div class="map-widget compass-widget">
               <i data-lucide="compass"></i>
             </div>
@@ -324,7 +324,7 @@
 
     </main>
 
-    <!-- DevOps showcase banner at the bottom -->
+    
     <section class="devops-showcase-section app-card">
       <div class="showcase-header">
         <div class="title-with-badge">
@@ -359,7 +359,7 @@
     </section>
   </div>
 
-  <!-- FLOATING SIDE DEVELOPER / SIMULATOR DOCK -->
+  
   <div class="simulator-drawer" id="simulator-drawer">
     <button class="drawer-toggle" id="btn-drawer-toggle">
       <i data-lucide="sliders" class="gear-icon"></i>
